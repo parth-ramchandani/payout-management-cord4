@@ -5,10 +5,10 @@ import { VendorModel } from "@/models/Vendor";
 import { requireAuth } from "@/lib/auth";
 
 const createVendorSchema = z.object({
-  name: z.string().min(1),
-  upi_id: z.string().min(1).optional(),
-  bank_account: z.string().min(1).optional(),
-  ifsc: z.string().min(1).optional(),
+  name: z.string().min(1, "Vendor name is required"),
+  upi_id: z.string().optional(),
+  bank_account: z.string().optional(),
+  ifsc: z.string().optional(),
   is_active: z.boolean().optional(),
 });
 
@@ -54,7 +54,11 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: err.flatten() },
+        {
+          error: "Validation failed",
+          message: "Please check the provided data and try again",
+          details: err.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }

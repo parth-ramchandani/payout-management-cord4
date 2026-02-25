@@ -5,10 +5,10 @@ import { VendorModel } from "@/models/Vendor";
 import { requireAuth } from "@/lib/auth";
 
 const updateVendorSchema = z.object({
-  name: z.string().min(1),
-  upi_id: z.string().min(1).optional().nullable(),
-  bank_account: z.string().min(1).optional().nullable(),
-  ifsc: z.string().min(1).optional().nullable(),
+  name: z.string().min(1, "Vendor name is required"),
+  upi_id: z.string().min(1, "UPI ID cannot be empty").optional().nullable(),
+  bank_account: z.string().min(1, "Bank account cannot be empty").optional().nullable(),
+  ifsc: z.string().min(1, "IFSC cannot be empty").optional().nullable(),
   is_active: z.boolean(),
 });
 
@@ -26,7 +26,10 @@ export async function GET(_request: Request, context: Params) {
 
     const vendor = await VendorModel.findById(id).lean();
     if (!vendor) {
-      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Vendor not found", message: `No vendor found with ID: ${id}` },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ vendor });
@@ -71,14 +74,21 @@ export async function PUT(request: Request, context: Params) {
     ).lean();
 
     if (!vendor) {
-      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Vendor not found", message: `No vendor found with ID: ${id}` },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ vendor });
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: err.flatten() },
+        {
+          error: "Validation failed",
+          message: "Please check the provided data and try again",
+          details: err.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }
@@ -109,7 +119,10 @@ export async function DELETE(_request: Request, context: Params) {
 
     const result = await VendorModel.findByIdAndDelete(id).lean();
     if (!result) {
-      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Vendor not found", message: `No vendor found with ID: ${id}` },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ ok: true });

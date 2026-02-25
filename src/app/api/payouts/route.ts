@@ -8,9 +8,13 @@ import { PayoutAuditModel } from "@/models/PayoutAudit";
 import { USER_ROLES } from "@/models/User";
 
 const createPayoutSchema = z.object({
-  vendor_id: z.string().min(1),
-  amount: z.number().positive(),
-  mode: z.enum(PAYOUT_MODES),
+  vendor_id: z.string().min(1, "Vendor ID is required"),
+  amount: z
+    .number("Amount must be a number")
+    .positive("Amount must be greater than 0"),
+  mode: z.enum(PAYOUT_MODES, {
+    message: `Mode must be one of: ${PAYOUT_MODES.join(", ")}`,
+  }),
   note: z.string().optional(),
 });
 
@@ -66,7 +70,10 @@ export async function POST(request: Request) {
 
     const vendor = await VendorModel.findById(parsed.vendor_id).lean();
     if (!vendor) {
-      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Vendor not found", message: `No vendor found with ID: ${parsed.vendor_id}` },
+        { status: 404 }
+      );
     }
 
     const payout = await PayoutModel.create({
@@ -90,7 +97,11 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: err.flatten() },
+        {
+          error: "Validation failed",
+          message: "Please check the provided data and try again",
+          details: err.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }

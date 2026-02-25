@@ -31,6 +31,8 @@ const PayoutAuditSchema = new Schema(
   }
 );
 
+PayoutAuditSchema.index({ payout_id: 1, createdAt: 1 });
+
 export type PayoutAudit = InferSchemaType<typeof PayoutAuditSchema>;
 
 export const PayoutAuditModel =

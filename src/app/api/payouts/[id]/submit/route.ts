@@ -23,7 +23,10 @@ export async function POST(_request: Request, context: Params) {
 
     if (payout.status !== "Draft") {
       return NextResponse.json(
-        { error: "Only Draft payouts can be submitted" },
+        {
+          error: "Invalid status transition",
+          message: `Only Draft payouts can be submitted. Current status: ${payout.status}`,
+        },
         { status: 400 }
       );
     }

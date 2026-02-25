@@ -18,12 +18,18 @@ export async function POST(_request: Request, context: Params) {
 
     const payout = await PayoutModel.findById(id);
     if (!payout) {
-      return NextResponse.json({ error: "Payout not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Payout not found", message: `No payout found with ID: ${id}` },
+        { status: 404 }
+      );
     }
 
     if (payout.status !== "Submitted") {
       return NextResponse.json(
-        { error: "Only Submitted payouts can be approved" },
+        {
+          error: "Invalid status transition",
+          message: `Only Submitted payouts can be approved. Current status: ${payout.status}`,
+        },
         { status: 400 }
       );
     }

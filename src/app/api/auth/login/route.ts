@@ -5,8 +5,8 @@ import { UserModel } from "@/models/User";
 import { signJwt, verifyPassword } from "@/lib/auth";
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email("Please provide a valid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export async function POST(request: Request) {
@@ -51,7 +51,11 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: err.flatten() },
+        {
+          error: "Validation failed",
+          message: "Please check your email and password",
+          details: err.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }

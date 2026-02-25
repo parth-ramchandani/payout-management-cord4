@@ -44,6 +44,9 @@ const PayoutSchema = new Schema(
   { timestamps: true }
 );
 
+PayoutSchema.index({ status: 1, createdAt: -1 });
+PayoutSchema.index({ vendor_id: 1 });
+
 export type Payout = InferSchemaType<typeof PayoutSchema>;
 
 export const PayoutModel =

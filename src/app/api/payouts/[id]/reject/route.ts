@@ -6,7 +6,7 @@ import { PayoutModel } from "@/models/Payout";
 import { PayoutAuditModel } from "@/models/PayoutAudit";
 
 const rejectSchema = z.object({
-  reason: z.string().min(1),
+  reason: z.string().min(1, "Rejection reason is required"),
 });
 
 interface Params {
@@ -26,12 +26,18 @@ export async function POST(request: Request, context: Params) {
 
     const payout = await PayoutModel.findById(id);
     if (!payout) {
-      return NextResponse.json({ error: "Payout not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Payout not found", message: `No payout found with ID: ${id}` },
+        { status: 404 }
+      );
     }
 
     if (payout.status !== "Submitted") {
       return NextResponse.json(
-        { error: "Only Submitted payouts can be rejected" },
+        {
+          error: "Invalid status transition",
+          message: `Only Submitted payouts can be rejected. Current status: ${payout.status}`,
+        },
         { status: 400 }
       );
     }
@@ -50,7 +56,11 @@ export async function POST(request: Request, context: Params) {
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: err.flatten() },
+        {
+          error: "Validation failed",
+          message: "Please check the provided data and try again",
+          details: err.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }

@@ -22,7 +22,10 @@ export async function GET(_request: Request, context: Params) {
       .lean();
 
     if (!payout) {
-      return NextResponse.json({ error: "Payout not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Payout not found", message: `No payout found with ID: ${id}` },
+        { status: 404 }
+      );
     }
 
     const audits = await PayoutAuditModel.find({ payout_id: id })
