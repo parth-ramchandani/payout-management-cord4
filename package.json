@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed.cjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.3.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.2",
     "next": "16.1.6",
