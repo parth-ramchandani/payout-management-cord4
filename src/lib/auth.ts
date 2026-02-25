@@ -64,7 +64,7 @@ export async function requireAuth() {
   return user;
 }
 
-export async function requireRole(allowedRoles: UserRole[]) {
+export async function requireRole(allowedRoles: readonly UserRole[]) {
   const user = await requireAuth();
   if (!allowedRoles.includes(user.role)) {
     throw Object.assign(new Error("Forbidden"), { statusCode: 403 });
