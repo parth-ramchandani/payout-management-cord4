@@ -188,6 +188,9 @@ export default function EditVendorPage() {
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 value={bankAccount}
                 onChange={(e) => setBankAccount(e.target.value)}
+                inputMode="numeric"
+                pattern="^[0-9]{9,18}$"
+                title="Bank account must be 9–18 digits"
               />
             </div>
           </div>
@@ -199,7 +202,10 @@ export default function EditVendorPage() {
             <input
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
               value={ifsc}
-              onChange={(e) => setIfsc(e.target.value)}
+              onChange={(e) => setIfsc(e.target.value.toUpperCase())}
+              maxLength={11}
+              pattern="^[A-Z]{4}0[A-Z0-9]{6}$"
+              title="IFSC must be 11 characters (e.g., HDFC0001234)"
             />
           </div>
 
